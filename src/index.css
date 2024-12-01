@@ -1,0 +1,92 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+}
+
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.game {
+  position:fixed;
+  top: 0;
+  width: 100vw;
+  height: 100dvh;
+  z-index: 2;
+  pointer-events: none;
+
+}
+
+.scanlines-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100dvh;
+  z-index: 9999;
+  pointer-events: none;
+}
+.scanlines {
+  overflow: hidden;
+  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100dvh;
+  z-index: 9999;
+}
+.scanlines:before,
+.scanlines:after {
+  display: block;
+  pointer-events: none;
+  content: "";
+  position: absolute;
+}
+.scanlines:before {
+  width: 100%;
+  height: 2px;
+  z-index: 2147483649;
+  background: rgba(0, 0, 0, 0.1);
+  opacity: 0.75;
+  animation: scanline 6s linear infinite;
+}
+.scanlines:after {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2147483648;
+  background: linear-gradient(
+      to bottom,
+      transparent 50%,
+      rgba(0, 0, 0, 0.2) 51%
+  );
+  background-size: 100% 4px;
+  animation: scanlines 1s steps(60) infinite;
+}
+
+/* ANIMATE UNIQUE SCANLINE */
+@keyframes scanline {
+  0% {
+      transform: translate3d(0, -200000%, 0);
+  }
+}
+@keyframes scanlines {
+  0% {
+      background-position: 0 50%;
+  }
+}
