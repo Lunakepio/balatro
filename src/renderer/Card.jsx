@@ -4,21 +4,29 @@ import { shake } from "./gsap/shake";
 import { cardHover, cardHoverOut } from "./gsap/cardHover";
 import { useFrame } from "@react-three/fiber";
 import { MathUtils, Vector2, Vector3 } from "three";
+import { onDragHandler } from "./functions/onDragHandler";
+import { updateVelocityAndRotation } from "./functions/updateVelocityAndRotation";
+import { tilt } from "./functions/tilt";
+import { useGameStore } from "../store/store";
+import { update } from "three/examples/jsm/libs/tween.module.js";
 
-export const Card = () => {
+export const Card = ({ id, basePosition }) => {
   const shadowRef = useRef();
   const cardRef = useRef();
   const isCardHoveredRef = useRef(false);
   const isCardClickedRef = useRef(false);
   const groupRef = useRef();
   const divider = 100;
-  const prevMousePosition = useRef(new Vector2(0, 0));
+  const prevGroupPosition = useRef(new Vector2(0, 0));
   const velocity = useRef(new Vector2(0, 0));
+  const cardSpacing = 7 / 8;
 
-  const timeMultipler = 1;
+  const timeMultiplier = 1;
   const rotationAmplifier = 0.2;
-  const tiltAmplifier = 2;
 
+  const { cards, removeCard, updateCardPosition } = useGameStore();
+  
+  const timeOffset = Math.random() * 10;
   useFrame((state) => {
     if (!cardRef.current) return;
     const time = state.clock.getElapsedTime();
@@ -27,90 +35,58 @@ export const Card = () => {
     const cardWorldPosition = cardRef.current.getWorldPosition(new Vector3());
     const cardWorld2DPosition = new Vector2(
       cardWorldPosition.x,
-      cardWorldPosition.y
+      cardWorldPosition.y,
     );
 
     const mousePosition = new Vector2(
-      (state.pointer.x * state.viewport.width) / 2,
-      (state.pointer.y * state.viewport.height) / 2
+      (pointer.x * state.viewport.width) / 2,
+      (pointer.y * state.viewport.height) / 2,
     );
 
-    if (groupRef.current && !isCardHoveredRef.current) {
-      groupRef.current.rotation.z =
-        MathUtils.lerp(
-          groupRef.current.rotation.z,
-          Math.sin(time * timeMultipler) * rotationAmplifier,
-          0.05
-        );
-      }
+    if (
+      groupRef.current &&
+      !isCardHoveredRef.current &&
+      !isCardClickedRef.current
+    ) {
+  
+    
+      const oscillation = Math.sin((time - timeOffset) * timeMultiplier) * rotationAmplifier;
+    
 
+      groupRef.current.rotation.z = MathUtils.lerp(
+        groupRef.current.rotation.z,
+        oscillation - (cardWorld2DPosition.x * 0.1),
+        0.1
+      );
+      
+    }
+    updateVelocityAndRotation(groupRef, prevGroupPosition, velocity);
+    onDragHandler(
+      groupRef.current.position,
+      mousePosition.x,
+      mousePosition.y,
+      basePosition,
+      isCardClickedRef.current,
+    );
 
-
-    // if (isCardHoveredRef.current && !isCardClickedRef.current) {
-
-
-    //   groupRef.current.rotation.y = MathUtils.lerp(
-    //     groupRef.current.rotation.y,
-    //     0,
-    //     0.1
-    //   );
-    //   groupRef.current.rotation.x = MathUtils.lerp(
-    //     groupRef.current.rotation.x,
-    //     0,
-    //     0.1
-    //   );
-
-    //   const xDistanceToPointer = cardWorld2DPosition.x - mousePosition.x;
-    //   const yDistanceToPointer = cardWorld2DPosition.y - mousePosition.y;
-
-    //   cardRef.current.rotation.y = -xDistanceToPointer * tiltAmplifier;
-    //   cardRef.current.rotation.x = yDistanceToPointer * tiltAmplifier;
-    // }
-
+    tilt(
+      groupRef.current,
+      isCardHoveredRef.current,
+      isCardClickedRef.current,
+      cardWorld2DPosition,
+      mousePosition,
+    );
 
     if (isCardClickedRef.current) {
-      velocity.current.x = mousePosition.x - prevMousePosition.current.x;
-      velocity.current.y = mousePosition.y - prevMousePosition.current.y;
-  
-      groupRef.current.position.x = MathUtils.lerp(
-        groupRef.current.position.x,
-        mousePosition.x,
-        0.1
-      );
-      groupRef.current.position.y = MathUtils.lerp(
-        groupRef.current.position.y,
-        mousePosition.y,
-        0.1
-      );
-  
-  
-      groupRef.current.rotation.z = MathUtils.lerp(
-        groupRef.current.rotation.z,
-        -velocity.current.x * 10,
-        0.05
-      );
-  
-  
-      prevMousePosition.current.copy(mousePosition);
-    } else {
-      groupRef.current.position.x = MathUtils.lerp(
-        groupRef.current.position.x,
-        0,
-        0.05
-      );
-      groupRef.current.position.y = MathUtils.lerp(
-        groupRef.current.position.y,
-        0,
-        0.05
+      console.log(id);
+      const newIndex = cards.findIndex(
+        (c) =>
+          c.basePosition.x > cardWorld2DPosition.x - cardSpacing / 2 &&
+          c.basePosition.x < cardWorld2DPosition.x + cardSpacing / 2,
       );
 
-      groupRef.current.rotation.z = MathUtils.lerp(
-        groupRef.current.rotation.z,
-        0,
-        0.05
-      );
+      updateCardPosition(id, newIndex);
     }
-    
   });
   return (
     <group ref={groupRef}>
@@ -134,19 +110,20 @@ export const Card = () => {
         onPointerUp={(e) => {
           e.stopPropagation();
           isCardClickedRef.current = false;
+          cardHoverOut(groupRef.current.scale);
         }}
         onPointerOver={(e) => {
           e.stopPropagation();
-          if(!isCardClickedRef.current) {
+          if (!isCardClickedRef.current) {
             shake(cardRef.current.rotation);
-            // cardHover(cardRef.current.position);
+            cardHover(groupRef.current.scale);
             isCardHoveredRef.current = true;
           }
         }}
         onPointerOut={(e) => {
           e.stopPropagation();
-          if(!isCardClickedRef.current) {
-            // cardHoverOut(cardRef.current.position, cardRef.current.rotation);
+          if (!isCardClickedRef.current) {
+            cardHoverOut(groupRef.current.scale);
             isCardHoveredRef.current = false;
           }
         }}

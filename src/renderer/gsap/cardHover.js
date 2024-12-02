@@ -1,27 +1,24 @@
 import gsap from "gsap";
 
 const duration = 0.2;
-export const cardHover = (target) => {
-  gsap.to(target, {
-    z: 0.5,
+
+const scaleTarget = 1.15;
+export const cardHover = (targetScale) => {
+  gsap.to(targetScale, {
+    z: scaleTarget,
+    y: scaleTarget,
+    x: scaleTarget,
     duration: duration,
     ease: "power1.inOut",
     repeat: 0,
   });
 };
 
-export const cardHoverOut = (targetPosition, targetRotation) => {
-
-  gsap.to(targetPosition, {
-    z: 0,
-    duration: duration,
-    ease: "power1.inOut",
-    repeat: 0,
-  });
-  gsap.to(targetRotation, {
-    y: 0,
-    x: 0,
-    z: 0,
+export const cardHoverOut = (targetScale) => {
+  gsap.to(targetScale, {
+    y: 1,
+    x: 1,
+    z: 1,
     duration: duration,
     ease: "power1.inOut",
     repeat: 0,

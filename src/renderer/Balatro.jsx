@@ -1,13 +1,11 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { useFrame } from '@react-three/fiber';
-import { ShaderMaterial, Vector2 } from 'three';
-import { OrbitControls } from '@react-three/drei';
+import { useRef } from "react";
+import { useFrame } from "@react-three/fiber";
+import { ShaderMaterial, Vector2 } from "three";
 
 export const Balatro = () => {
   const meshRef = useRef();
 
-  const fragmentShader = /* glsl */`
+  const fragmentShader = /* glsl */ `
     #define PIXEL_SIZE_FAC 700.0
     #define SPIN_EASE 0.5
     #define colour_2 vec4(0.0,156.0/255.0,1.0,1.0)
@@ -22,7 +20,7 @@ export const Balatro = () => {
     void mainImage(out vec4 fragColor, in vec2 fragCoord) {
       float pixel_size = length(iResolution.xy) / PIXEL_SIZE_FAC;
 
-      vec2 uv = (fragCoord.xy - 2. * iResolution.xy) / 2000.0;
+      vec2 uv = (fragCoord.xy - 1. * iResolution.xy) / 2000.0;
       float uv_len = length(uv);
 
       float speed = (iTime * SPIN_EASE * 0.1) + 302.2;
@@ -55,7 +53,7 @@ export const Balatro = () => {
     }
   `;
 
-  const vertexShader = /* glsl */`
+  const vertexShader = /* glsl */ `
     void main() {
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }
@@ -64,20 +62,23 @@ export const Balatro = () => {
   const shaderMaterial = new ShaderMaterial({
     uniforms: {
       iTime: { value: 0 },
-      iResolution: { value: new Vector2(window.innerWidth / 2, window.innerHeight / 2) },
+      iResolution: {
+        value: new Vector2(window.innerWidth / 2, window.innerHeight / 2),
+      },
     },
     fragmentShader,
     vertexShader,
   });
 
-
-    useFrame((state) => {
-        if (meshRef.current) {
-          meshRef.current.material.uniforms.iTime.value = state.clock.getElapsedTime();
-        }
-      });
+  useFrame((state) => {
+    if (meshRef.current) {
+      meshRef.current.material.uniforms.iTime.value =
+        state.clock.getElapsedTime();
+    }
+  });
 
   return (
+    
     <mesh ref={meshRef} material={shaderMaterial}>
       <planeGeometry args={[window.innerWidth, window.innerHeight]} />
     </mesh>
