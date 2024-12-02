@@ -8,7 +8,6 @@ import { onDragHandler } from "./functions/onDragHandler";
 import { updateVelocityAndRotation } from "./functions/updateVelocityAndRotation";
 import { tilt } from "./functions/tilt";
 import { useGameStore } from "../store/store";
-import { update } from "three/examples/jsm/libs/tween.module.js";
 
 export const Card = ({ id, basePosition }) => {
   const shadowRef = useRef();
@@ -25,18 +24,22 @@ export const Card = ({ id, basePosition }) => {
   const rotationAmplifier = 0.2;
 
   const { cards, removeCard, updateCardPosition } = useGameStore();
+  const clickTime = useRef(0);
   
-  const timeOffset = Math.random() * 10;
-  useFrame((state) => {
+  const shouldDragThreshold = 0.2;
+  
+  const isSelected = useRef(false);
+  
+  useFrame((state, delta) => {
     if (!cardRef.current) return;
     const time = state.clock.getElapsedTime();
-    const delta = state.clock.getDelta();
     const pointer = state.pointer;
     const cardWorldPosition = cardRef.current.getWorldPosition(new Vector3());
     const cardWorld2DPosition = new Vector2(
       cardWorldPosition.x,
       cardWorldPosition.y,
     );
+    const shouldDrag = clickTime.current > shouldDragThreshold;
 
     const mousePosition = new Vector2(
       (pointer.x * state.viewport.width) / 2,
@@ -50,7 +53,7 @@ export const Card = ({ id, basePosition }) => {
     ) {
   
     
-      const oscillation = Math.sin((time - timeOffset) * timeMultiplier) * rotationAmplifier;
+      const oscillation = Math.sin((time - id * 0.2) * timeMultiplier) * rotationAmplifier;
     
 
       groupRef.current.rotation.z = MathUtils.lerp(
@@ -61,12 +64,15 @@ export const Card = ({ id, basePosition }) => {
       
     }
     updateVelocityAndRotation(groupRef, prevGroupPosition, velocity);
+    
     onDragHandler(
       groupRef.current.position,
       mousePosition.x,
       mousePosition.y,
       basePosition,
       isCardClickedRef.current,
+      shouldDrag,
+      isSelected.current
     );
 
     tilt(
@@ -78,7 +84,7 @@ export const Card = ({ id, basePosition }) => {
     );
 
     if (isCardClickedRef.current) {
-      console.log(id);
+      clickTime.current += delta
       const newIndex = cards.findIndex(
         (c) =>
           c.basePosition.x > cardWorld2DPosition.x - cardSpacing / 2 &&
@@ -86,7 +92,10 @@ export const Card = ({ id, basePosition }) => {
       );
 
       updateCardPosition(id, newIndex);
+    } else {
+      clickTime.current = 0;
     }
+    shouldDrag ? isSelected.current = false : null;
   });
   return (
     <group ref={groupRef}>
@@ -100,12 +109,14 @@ export const Card = ({ id, basePosition }) => {
         <planeGeometry args={[73 / divider, 97 / divider]} />
       </Image>
       <Image
+        castShadow
         ref={cardRef}
         url="./ace.webp"
         transparent={true}
         onPointerDown={(e) => {
           e.stopPropagation();
           isCardClickedRef.current = true;
+          isSelected.current = !isSelected.current
         }}
         onPointerUp={(e) => {
           e.stopPropagation();

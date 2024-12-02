@@ -11,22 +11,20 @@ function App() {
         <Balatro />
         <group position={[0, 0, 0]}>
           <Slot />
-
-          {/* <Card /> */}
         </group>
-        {/* <directionalLight
-        intensity={0.25}
-        position={[0, 1, 3]}
+        <directionalLight
+        intensity={10}
+        position={[0, 10, 0]}
         castShadow
         shadow-mapSize-height={2048}
         shadow-mapSize-width={2048}
-        shadow-camera-far={10}
+        shadow-camera-far={100}
         shadow-camera-near={0}
-        shadow-camera-bottom={-5}
-        shadow-camera-top={5}
-        shadow-camera-right={5}
-        shadow-camera-left={-5}
-      /> */}
+        shadow-camera-bottom={-20}
+        shadow-camera-top={20}
+        shadow-camera-right={20}
+        shadow-camera-left={20}
+      />
       </WebGLCanvas>
 
       {/* <Game /> */}

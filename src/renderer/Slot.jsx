@@ -22,7 +22,7 @@ export const Slot = () => {
         id: index,
         basePosition: new Vector2(
           -planeWidth / 2 + cardSpacing * (index + 0.5),
-          (Math.sin((index / (cardCount - 1)) * Math.PI)) * 0.1
+          ((Math.sin((index / (cardCount - 1)) * Math.PI)) * 0.1)
         ),
       })),
     );

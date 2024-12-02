@@ -1,33 +1,37 @@
 import { OrthographicCamera } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
 import { useRef, useEffect } from "react";
+import { useControls } from "leva";
 
 export const Cam = () => {
   const camera = useRef();
-  const size = useThree();
+  const { width, height } = useControls("Viewport", {
+    width: { value: 10, step: 0.1 },
+    height: { value: 10, step: 0.1 },
+  });
 
   useEffect(() => {
     if (camera.current) {
-      const aspect = size.width / size.height;
-      const zoomLevel = 10;
+      const aspect = width / height;
+      const zoomLevel = 5;
 
       camera.current.left = -zoomLevel * aspect;
       camera.current.right = zoomLevel * aspect;
-      camera.current.top = zoomLevel;
+      camera.current.top = zoomLevel * aspect;
       camera.current.bottom = -zoomLevel;
 
       camera.current.updateProjectionMatrix();
     }
-  }, [size.width, size.height]);
+  }, [width, height]);
 
   return (
     <OrthographicCamera
-      position={[0, 0, 0]}
-      near={0.1}
-      far={1000}
-      makeDefault
       ref={camera}
-      rotation={[0, -Math.PI, 0]}
+      position={[0, 0, 10]}
+      rotation={[0, 0, 0]} 
+      near={0.1}
+      far={100}
+      makeDefault
     />
   );
 };
