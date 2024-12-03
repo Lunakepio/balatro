@@ -23,7 +23,7 @@ export const useGameStore = create((set) => ({
     });
   },
   setCards: (cards) => {
-    set((state) => ({
+    set(() => ({
       cards,
     }));
   },

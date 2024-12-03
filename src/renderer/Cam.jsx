@@ -1,5 +1,4 @@
 import { OrthographicCamera } from "@react-three/drei";
-import { useThree } from "@react-three/fiber";
 import { useRef, useEffect } from "react";
 import { useControls } from "leva";
 

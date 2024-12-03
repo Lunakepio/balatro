@@ -1,7 +1,5 @@
 import { WebGLCanvas } from "./renderer/WebGLCanvas";
 import { Balatro } from "./renderer/Balatro";
-import { Game } from "./Game";
-// import { Card } from "./renderer/Card";
 import { Slot } from "./renderer/Slot";
 
 function App() {

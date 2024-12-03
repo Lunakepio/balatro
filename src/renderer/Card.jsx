@@ -1,5 +1,5 @@
 import { Image } from "@react-three/drei";
-import { useEffect, useState, useRef } from "react";
+import { useRef } from "react";
 import { shake } from "./gsap/shake";
 import { cardHover, cardHoverOut } from "./gsap/cardHover";
 import { useFrame } from "@react-three/fiber";
@@ -8,6 +8,7 @@ import { onDragHandler } from "./functions/onDragHandler";
 import { updateVelocityAndRotation } from "./functions/updateVelocityAndRotation";
 import { tilt } from "./functions/tilt";
 import { useGameStore } from "../store/store";
+import PropTypes from "prop-types";
 
 export const Card = ({ id, basePosition }) => {
   const shadowRef = useRef();
@@ -23,7 +24,7 @@ export const Card = ({ id, basePosition }) => {
   const timeMultiplier = 1;
   const rotationAmplifier = 0.2;
 
-  const { cards, removeCard, updateCardPosition } = useGameStore();
+  const { cards, updateCardPosition } = useGameStore();
   const clickTime = useRef(0);
   
   const shouldDragThreshold = 0.2;
@@ -144,3 +145,8 @@ export const Card = ({ id, basePosition }) => {
     </group>
   );
 };
+
+Card.propTypes = {
+  id: PropTypes.number.isRequired,
+  basePosition: PropTypes.instanceOf(Vector2).isRequired,
+}

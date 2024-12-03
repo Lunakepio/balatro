@@ -1,9 +1,8 @@
 import { extend } from "@react-three/fiber";
 import { geometry } from "maath";
-import React, { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { Card } from "./Card";
-import { Vector2, Vector3 } from "three";
-import { shuffle } from "lodash";
+import { Vector2} from "three";
 import { useGameStore } from "../store/store";
 
 extend({ RoundedPlaneGeometry: geometry.RoundedPlaneGeometry });
