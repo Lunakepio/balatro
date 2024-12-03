@@ -1,8 +1,48 @@
-# React + Vite
+# Balatro.js - JavaScript/WebGL Balatro
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is a remake of Balatro's logic and animation brought to you in a browser. 
 
-Currently, two official plugins are available:
+## How to install
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Fork the repository
+
+Clone the repository or download it
+
+Open your terminal and inside the project folder, run :
+
+```bash
+  bun install
+```
+
+Start the dev server
+
+```bash
+  bun run dev
+```
+
+## Stack used
+
+- React
+- Three.js
+- Bun
+- Vite
+- ESLint
+- Prettier
+
+## How to use
+
+Open the webpage, play with the cards, enjoy the animations and shaders.
+
+## License
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+## Credits
+
+All the credits goes to Balatro for the original game.
+
+[Play Balatro](https://www.playbalatro.com/)
+
+[Balatro's Twitter](https://x.com/BalatroGame)
+
+[Balatro's maker](https://x.com/LocalThunk)
