@@ -1,12 +1,9 @@
 import { Image } from "@react-three/drei";
 import { useRef } from "react";
-import { shake } from "./gsap/shake";
-import { cardHover, cardHoverOut } from "./gsap/cardHover";
 import { useFrame } from "@react-three/fiber";
 import { MathUtils, Vector2, Vector3 } from "three";
-import { onDragHandler } from "./functions/onDragHandler";
-import { updateVelocityAndRotation } from "./functions/updateVelocityAndRotation";
-import { tilt } from "./functions/tilt";
+import { shake, cardHover, cardHoverOut } from "./tweens";
+import { onDragHandler, tilt, updateVelocityAndRotation } from "./utils";
 import { useGameStore } from "../store/store";
 import PropTypes from "prop-types";
 
@@ -26,46 +23,49 @@ export const Card = ({ id, basePosition }) => {
 
   const { cards, updateCardPosition } = useGameStore();
   const clickTime = useRef(0);
-  
+
   const shouldDragThreshold = 0.2;
-  
+
   const isSelected = useRef(false);
-  
+
   useFrame((state, delta) => {
     if (!cardRef.current) return;
     const time = state.clock.getElapsedTime();
-    const pointer = state.pointer;
+    const { pointer, size, camera } = state;
     const cardWorldPosition = cardRef.current.getWorldPosition(new Vector3());
+    const cameraPosition = camera.position;
     const cardWorld2DPosition = new Vector2(
       cardWorldPosition.x,
-      cardWorldPosition.y,
+      cardWorldPosition.y
     );
     const shouldDrag = clickTime.current > shouldDragThreshold;
-
-    const mousePosition = new Vector2(
-      (pointer.x * state.viewport.width) / 2,
-      (pointer.y * state.viewport.height) / 2,
-    );
 
     if (
       groupRef.current &&
       !isCardHoveredRef.current &&
       !isCardClickedRef.current
     ) {
-  
-    
-      const oscillation = Math.sin((time - id * 0.2) * timeMultiplier) * rotationAmplifier;
-    
+      const oscillation =
+        Math.sin((time - id * 0.2) * timeMultiplier) * rotationAmplifier;
 
       groupRef.current.rotation.z = MathUtils.lerp(
         groupRef.current.rotation.z,
-        oscillation - (cardWorld2DPosition.x * 0.1),
+        oscillation - cardWorld2DPosition.x * 0.1,
         0.1
       );
-      
     }
     updateVelocityAndRotation(groupRef, prevGroupPosition, velocity);
-    
+    const frustumSize = 5;
+    const aspect = size.width / size.height;
+
+    const frustumWidth = frustumSize * aspect * 2;
+    const frustumHeight = frustumSize * 2;
+
+    const mousePosition = new Vector2(
+      pointer.x * (frustumWidth / 2) + cameraPosition.x,
+      pointer.y * (frustumHeight / 2) + cameraPosition.y
+    );
+
     onDragHandler(
       groupRef.current.position,
       mousePosition.x,
@@ -81,22 +81,22 @@ export const Card = ({ id, basePosition }) => {
       isCardHoveredRef.current,
       isCardClickedRef.current,
       cardWorld2DPosition,
-      mousePosition,
+      mousePosition
     );
 
     if (isCardClickedRef.current) {
-      clickTime.current += delta
+      clickTime.current += delta;
       const newIndex = cards.findIndex(
         (c) =>
           c.basePosition.x > cardWorld2DPosition.x - cardSpacing / 2 &&
-          c.basePosition.x < cardWorld2DPosition.x + cardSpacing / 2,
+          c.basePosition.x < cardWorld2DPosition.x + cardSpacing / 2
       );
 
       updateCardPosition(id, newIndex);
     } else {
       clickTime.current = 0;
     }
-    shouldDrag ? isSelected.current = false : null;
+    shouldDrag ? (isSelected.current = false) : null;
   });
   return (
     <group ref={groupRef}>
@@ -117,7 +117,8 @@ export const Card = ({ id, basePosition }) => {
         onPointerDown={(e) => {
           e.stopPropagation();
           isCardClickedRef.current = true;
-          isSelected.current = !isSelected.current
+          isSelected.current = !isSelected.current;
+          document.body.style.cursor = "grabbing";
         }}
         onPointerUp={(e) => {
           e.stopPropagation();
@@ -131,6 +132,7 @@ export const Card = ({ id, basePosition }) => {
             cardHover(groupRef.current.scale);
             isCardHoveredRef.current = true;
           }
+          document.body.style.cursor = "grab";
         }}
         onPointerOut={(e) => {
           e.stopPropagation();
@@ -138,6 +140,7 @@ export const Card = ({ id, basePosition }) => {
             cardHoverOut(groupRef.current.scale);
             isCardHoveredRef.current = false;
           }
+            document.body.style.cursor = "default";
         }}
       >
         <planeGeometry args={[73 / divider, 97 / divider]} />
@@ -149,4 +152,4 @@ export const Card = ({ id, basePosition }) => {
 Card.propTypes = {
   id: PropTypes.number.isRequired,
   basePosition: PropTypes.instanceOf(Vector2).isRequired,
-}
+};

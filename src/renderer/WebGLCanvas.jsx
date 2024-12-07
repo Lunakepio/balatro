@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { Canvas } from '@react-three/fiber';
+import { Cam } from './Cam';
 
 export const WebGLCanvas = ({ children }) => {
   return (
@@ -8,6 +9,7 @@ export const WebGLCanvas = ({ children }) => {
       gl={{ antialias: false, alpha: false, depth: false, stencil: false }}
     >
       {children}
+      <Cam />
     </Canvas>
   );
 };

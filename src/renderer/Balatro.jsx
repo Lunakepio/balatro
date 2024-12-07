@@ -20,7 +20,7 @@ export const Balatro = () => {
     void mainImage(out vec4 fragColor, in vec2 fragCoord) {
       float pixel_size = length(iResolution.xy) / PIXEL_SIZE_FAC;
 
-      vec2 uv = (fragCoord.xy - 1. * iResolution.xy) / 1200.0;
+      vec2 uv = (fragCoord.xy - 2. * iResolution.xy) / 3000.0;
       float uv_len = length(uv);
 
       float speed = (iTime * SPIN_EASE * 0.1) + 302.2;
