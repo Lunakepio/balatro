@@ -1,4 +1,4 @@
-# Balatro.js - JavaScript/WebGL Balatro
+# Balatro.js - JavaScript/WebGL Balatro ♠️♦️♣️♥️
 
 This project is a remake of Balatro's logic and animation brought to you in a browser. 
 
