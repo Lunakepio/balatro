@@ -29,7 +29,7 @@ export const Slot = () => {
 
   return (
     <>
-      <mesh transparent ref={meshRef}>
+      <mesh transparent ref={meshRef} position={[0, 0, 0]}>
         <roundedPlaneGeometry args={[7, 1, 0.15]} />
         <meshBasicMaterial color="black" opacity={0.3} transparent />
       </mesh>
