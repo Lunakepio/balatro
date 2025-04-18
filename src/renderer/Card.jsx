@@ -1,14 +1,16 @@
 import { Image } from "@react-three/drei";
 import { useRef } from "react";
-import { useFrame, useLoader } from "@react-three/fiber";
-import { MathUtils, TextureLoader, Vector2, Vector3 } from "three";
+import { useFrame } from "@react-three/fiber";
+import { MathUtils, Vector2, Vector3, Texture } from "three";
 import { shake, cardHover, cardHoverOut } from "./tweens";
 import { onDragHandler, tilt, updateVelocityAndRotation } from "./utils";
 import { useGameStore } from "../store/store";
 import PropTypes from "prop-types";
-import { useHolographicMaterial } from "./materials/holographicMaterial";
+import { useHolographicMaterial } from "./materials/holographic/HolographicMaterial";
+import { useNegativeMaterial } from "./materials/negative/NegativeMaterial";
+import { useBasicMaterial } from "./materials/basic/BasicMaterial";
 
-export const Card = ({ id, basePosition }) => {
+export const Card = ({ id, basePosition, texture, material}) => {
   const shadowRef = useRef();
   const cardRef = useRef();
   const isCardHoveredRef = useRef(false);
@@ -19,8 +21,12 @@ export const Card = ({ id, basePosition }) => {
   const velocity = useRef(new Vector2(0, 0));
   const cardSpacing = 7 / 8;
 
-  const texture = useLoader(TextureLoader, "./joker.webp");
-  const material = useHolographicMaterial(texture, groupRef);
+  const holographicMaterial = useHolographicMaterial(texture, groupRef);
+  const negativeMaterial = useNegativeMaterial(texture, groupRef);
+  const basicMaterial = useBasicMaterial(texture, groupRef);
+  const materials = [holographicMaterial, negativeMaterial, basicMaterial, basicMaterial];
+  
+  const mat = materials[material];
 
   const timeMultiplier = 1;
   const rotationAmplifier = 0.2;
@@ -118,7 +124,7 @@ export const Card = ({ id, basePosition }) => {
       >
         <planeGeometry args={[73 / divider, 97 / divider]} />
       </Image>
-      <mesh material={material}
+      <mesh material={mat}
         castShadow
         ref={cardRef}
         onPointerDown={(e) => {
@@ -159,4 +165,6 @@ export const Card = ({ id, basePosition }) => {
 Card.propTypes = {
   id: PropTypes.number.isRequired,
   basePosition: PropTypes.instanceOf(Vector2).isRequired,
+  texture: PropTypes.instanceOf(Texture).isRequired,
+  material: PropTypes.number.isRequired,
 };

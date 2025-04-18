@@ -3,7 +3,6 @@ precision mediump float;
 uniform sampler2D uTexture;
 uniform float uTime;
 uniform vec2 uRotation;
-uniform float randomNumber;
 
 varying vec2 vUv;
 
@@ -60,7 +59,7 @@ void main() {
   vec3 finalColor = texture.rgb * 1. + color;
 
 if(shouldBeTransparent) {
-   finalColor = mix(texture.rgb, color, blendStrength * 0.1);
+   finalColor = mix(texture.rgb, color, blendStrength * 0.05);
 }
 
   gl_FragColor = vec4(finalColor, texture.a);

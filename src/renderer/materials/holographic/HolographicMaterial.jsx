@@ -15,7 +15,6 @@ export const useHolographicMaterial = (texture, groupRef) => {
         uTexture: { value: texture },
         uTime: { value: 0 },
         uRotation : { value : 0 },
-        randomNumber : { value : Math.random()}
       },
       vertexShader,
       fragmentShader,
