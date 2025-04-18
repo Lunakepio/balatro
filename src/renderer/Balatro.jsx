@@ -28,7 +28,7 @@ export const Balatro = () => {
 
       uv = vec2(uv_len * cos(new_pixel_angle), uv_len * sin(new_pixel_angle));
 
-      uv *= 30.0;
+      uv *= 25.0;
       speed = iTime * 1.0;
       vec2 uv2 = vec2(uv.x + uv.y);
 
@@ -45,6 +45,7 @@ export const Balatro = () => {
       float c3p = 1.0 - min(1.0, c1p + c2p);
 
       vec4 ret_col = (0.3 / contrast) * colour_1 + (1.0 - 0.3 / contrast) * (colour_1 * c1p + colour_2 * c2p + vec4(c3p * colour_3.rgb, c3p * colour_1.a)) + 0.3 * max(c1p * 5.0 - 4.0, 0.0) + 0.4 * max(c2p * 5.0 - 4.0, 0.0);
+
       fragColor = ret_col;
     }
 

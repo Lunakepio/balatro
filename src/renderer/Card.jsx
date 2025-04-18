@@ -1,22 +1,32 @@
 import { Image } from "@react-three/drei";
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { MathUtils, Vector2, Vector3 } from "three";
+import { MathUtils, Vector2, Vector3, Texture } from "three";
 import { shake, cardHover, cardHoverOut } from "./tweens";
 import { onDragHandler, tilt, updateVelocityAndRotation } from "./utils";
 import { useGameStore } from "../store/store";
 import PropTypes from "prop-types";
+import { useHolographicMaterial } from "./materials/holographic/HolographicMaterial";
+import { useNegativeMaterial } from "./materials/negative/NegativeMaterial";
+import { useBasicMaterial } from "./materials/basic/BasicMaterial";
 
-export const Card = ({ id, basePosition }) => {
+export const Card = ({ id, basePosition, texture, material}) => {
   const shadowRef = useRef();
   const cardRef = useRef();
   const isCardHoveredRef = useRef(false);
   const isCardClickedRef = useRef(false);
   const groupRef = useRef();
-  const divider = 100;
+  const divider = 80;
   const prevGroupPosition = useRef(new Vector2(0, 0));
   const velocity = useRef(new Vector2(0, 0));
   const cardSpacing = 7 / 8;
+
+  const holographicMaterial = useHolographicMaterial(texture, groupRef);
+  const negativeMaterial = useNegativeMaterial(texture, groupRef);
+  const basicMaterial = useBasicMaterial(texture, groupRef);
+  const materials = [holographicMaterial, negativeMaterial, basicMaterial, basicMaterial];
+  
+  const mat = materials[material];
 
   const timeMultiplier = 1;
   const rotationAmplifier = 0.2;
@@ -51,6 +61,11 @@ export const Card = ({ id, basePosition }) => {
       groupRef.current.rotation.z = MathUtils.lerp(
         groupRef.current.rotation.z,
         oscillation - cardWorld2DPosition.x * 0.1,
+        0.1
+      );
+      groupRef.current.rotation.y = MathUtils.lerp(
+        groupRef.current.rotation.x,
+        oscillation - cardWorld2DPosition.y * 0.1,
         0.1
       );
     }
@@ -99,21 +114,19 @@ export const Card = ({ id, basePosition }) => {
     shouldDrag ? (isSelected.current = false) : null;
   });
   return (
-    <group ref={groupRef}>
+    <group ref={groupRef} position-z={0.3}>
       <Image
-        url="./shadow.webp"
+        url="./joker.webp"
         transparent={true}
         position={[0, -0.05, -0.1]}
-        opacity={0.3}
+        opacity={0.}
         ref={shadowRef}
       >
         <planeGeometry args={[73 / divider, 97 / divider]} />
       </Image>
-      <Image
+      <mesh material={mat}
         castShadow
         ref={cardRef}
-        url="./ace.webp"
-        transparent={true}
         onPointerDown={(e) => {
           e.stopPropagation();
           isCardClickedRef.current = true;
@@ -144,7 +157,7 @@ export const Card = ({ id, basePosition }) => {
         }}
       >
         <planeGeometry args={[73 / divider, 97 / divider]} />
-      </Image>
+      </mesh>
     </group>
   );
 };
@@ -152,4 +165,6 @@ export const Card = ({ id, basePosition }) => {
 Card.propTypes = {
   id: PropTypes.number.isRequired,
   basePosition: PropTypes.instanceOf(Vector2).isRequired,
+  texture: PropTypes.instanceOf(Texture).isRequired,
+  material: PropTypes.number.isRequired,
 };

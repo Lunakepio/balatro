@@ -5,7 +5,7 @@ import { Cam } from './Cam';
 export const WebGLCanvas = ({ children }) => {
   return (
     <Canvas
-      dpr={[1, 2]}
+      dpr={2}
       gl={{ antialias: false, alpha: false, depth: false, stencil: false }}
     >
       {children}
